@@ -1,6 +1,7 @@
 from PPlay.sprite import *
 from PPlay.window import *
 from random import randint
+import Mdificuldade as md
 
 # definindo a janela e os inputs
 janela = Window(500, 800)
@@ -140,7 +141,8 @@ def jogar_def(janela, teclado):
     sobra = janela.height - fundo.height
     fundo2 = Sprite('assets/background/fundo.png')
     fundo2.set_position(0, -fundo2.height - fundo.height + janela.height)
-
+    # velocidade de rolagem de fundo
+    fundo_vel = 200
     # margem da imagem de fundo que é ocupada pela calçada
     rua_i = 50
     rua_f = fundo.width - 50
@@ -170,7 +172,7 @@ def jogar_def(janela, teclado):
         # comportamento fora da tela
         if inimigo.y >= janela.height:
             inimigo.y = -inimigo.height
-            # seleção aleatria de uma faixa
+            # seleção aleatria de uma faixag
             faixa = randint(1, 4)
             if faixa == 1:
                 inimigo.x = rua_i + janela.width / 8 - inimigo.width
@@ -195,11 +197,18 @@ def jogar_def(janela, teclado):
     m3.set_position(pos_moedas, m2.y + margem_coletaveis)
     Moedas = [m1, m2, m3]
 
-    def mover_moedas(moedas, janela):
+    def mover_moedas(lista_moedas, janela, vel):
+        moedas = lista_moedas
         for mod in moedas:
-            mod.move_y(200 * janela.delta_time())
+            mod.move_y(vel * janela.delta_time())
             if mod.y >= janela.height:
                 mod.y = -mod.height
+                if mod == Sprite("assets/coletaveis/coletado20x20.png"):
+                    modx = mod.x
+                    mody = mod.y
+                    mod = Sprite("assets/coletaveis/moeda.png")
+                    mod.set_sequence_time(0, 8, 300, True)
+                    mod.set_position(modx, mody)
                 if mod == moedas[-1]:
                     faixa = randint(1, 4)
                     if faixa == 1:
@@ -259,8 +268,8 @@ def jogar_def(janela, teclado):
             gameOver(teclado, janela)
 
         # definição da velocidade qual o fundo estara deslizando:
-        fundo2.move_y(200 * janela.delta_time())
-        fundo.move_y(200 * janela.delta_time())
+        fundo2.move_y(fundo_vel * janela.delta_time())
+        fundo.move_y(fundo_vel * janela.delta_time())
 
         # mecanismo de reposição do fundo:
         if fundo2.y > janela.height:
@@ -283,10 +292,16 @@ def jogar_def(janela, teclado):
         # atualizando a posição dos coletaveis
         if Moedas != []:
             for mod in Moedas:
-                mod.draw()
-                mod.update()
-        mover_moedas(Moedas, janela)
-        mover_moedas(Moedas, janela)
+                modx = mod.x
+                mody = mod.y
+                if mod.collided(player):
+                    mod = Sprite("assets/coletaveis/coletado20x20.png")
+                    mod.set_position(modx, mody)
+                else:
+                    mod.draw()
+                    mod.update()
+        mover_moedas(Moedas, janela, fundo_vel)
+        #mover_moedas(Moedas, janela, fundo_vel)
         print(Moedas)
         # desenhando o player:
         player.draw()
@@ -332,7 +347,7 @@ while running:
         if mouse.is_button_pressed(1):
             mouse.set_position(200, 200)
             # chamando a função da tela de seleção de dificuldade
-            selec_dif()
+            md.selec_dif(janela, teclado, mouse)
     else:
         botao2 = Sprite("assets/BUTTONS/botao1.png")
         botao2.set_position(janela.width / 2 - botao2.width / 2, botao1.y + botao1.height + botao2.height / 2)
