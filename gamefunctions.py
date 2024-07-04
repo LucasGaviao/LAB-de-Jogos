@@ -1,15 +1,16 @@
 from PPlay.sprite import *
-from PPlay.window import *
 from random import randint
 
 # função que move os inimigos na tela, deve ser recvisado para aumentar a variação dos inimigos e/ou
 # evitar sobreposição nas faixas.
-def mover_inimigo(inimigo, janela, rua_i):
+
+
+def mover_inimigo(inimigo, vel_bonus, janela, rua_i):
     # definindo a velociade que o inimigo ira se mover na tela.
     # possivelmente se tornara um parametro a ser recebido.
 
     # comportamento na tela
-    inimigo.move_y(400 * janela.delta_time())
+    inimigo.move_y(200 * janela.delta_time())
 
     # comportamento fora da tela
     if inimigo.y >= janela.height:
@@ -50,6 +51,7 @@ def mover_moedas(lista_moedas, janela, rua_i, vel):
                     mod.x = rua_i + janela.width / 1.5
             else:
                 mod.x = moedas[-1].x
+
 
 def gameOver(teclado, janela):
     gameover = Sprite("assets/background/game_over.png")

@@ -1,9 +1,11 @@
 from PPlay.sprite import *
 from PPlay.window import *
-from random import randint
+from pygame.time import Clock
 import gamefunctions as GF
 
+
 def jogar_def(janela, teclado):
+    clock = Clock()
     # definindo as imagens que compoem o fundo do jogo (chão/rua)
     # são usadas as variaveis fundo e fundo2 pois precisamos que o fundo2 complete o gap deixado pelo fundo e vice
     # versa.
@@ -32,7 +34,6 @@ def jogar_def(janela, teclado):
     inimigo2 = Sprite('assets/inimigos/busuff.png')
     inimigo2.set_position(rua_i + janela.width / 4, 0)
 
-
     # coletaveis
     margem_coletaveis = 30
     m1 = Sprite("assets/coletaveis/moeda.png", 9)
@@ -47,6 +48,9 @@ def jogar_def(janela, teclado):
     m3.set_position(pos_moedas, m2.y + margem_coletaveis)
     Moedas = [m1, m2, m3]
 
+    # bonus de velocidade com o tempo
+    vel_bonus = 0
+    cont_tick = 0
 
     # loop principal de jogo:
     inGame = True
@@ -85,8 +89,8 @@ def jogar_def(janela, teclado):
             GF.gameOver(teclado, janela)
 
         # definição da velocidade qual o fundo estara deslizando:
-        fundo2.move_y(fundo_vel * janela.delta_time())
-        fundo.move_y(fundo_vel * janela.delta_time())
+        fundo2.move_y(fundo_vel * janela.delta_time() + vel_bonus/2)
+        fundo.move_y(fundo_vel * janela.delta_time() + vel_bonus/2)
 
         # mecanismo de reposição do fundo:
         if fundo2.y > janela.height:
@@ -96,8 +100,8 @@ def jogar_def(janela, teclado):
 
         # atualizando e desenhando os componentes de jogo na tela
         # atualizando a posição dos inimigos:
-        GF.mover_inimigo(inimigo1, janela, rua_i)
-        GF.mover_inimigo(inimigo2, janela, rua_i)
+        GF.mover_inimigo(inimigo1, vel_bonus, janela, rua_i)
+        GF.mover_inimigo(inimigo2, vel_bonus, janela, rua_i)
 
         # definindo a cor do fundo
         janela.set_background_color('black')
@@ -107,7 +111,7 @@ def jogar_def(janela, teclado):
         fundo.draw()
 
         # atualizando a posição dos coletaveis
-        if Moedas != []:
+        if Moedas:
             for mod in Moedas:
                 modx = mod.x
                 mody = mod.y
@@ -118,8 +122,18 @@ def jogar_def(janela, teclado):
                     mod.draw()
                     mod.update()
         GF.mover_moedas(Moedas, janela, fundo_vel, rua_i)
-        #mover_moedas(Moedas, janela, fundo_vel)
+        # mover_moedas(Moedas, janela, fundo_vel)
         print(Moedas)
+
+        cont_tick += 1
+        if cont_tick == 60 and vel_bonus < 200:
+            cont_tick = 0
+            vel_bonus += 0.1
+            if vel_bonus == 100:
+                player_vel += 50
+            if vel_bonus == 200:
+                player_vel += 50
+
         # desenhando o player:
         player.draw()
 
@@ -128,5 +142,5 @@ def jogar_def(janela, teclado):
         inimigo2.draw()
 
         # atualizando a tela.
+        clock.tick(60)
         janela.update()
-

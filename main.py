@@ -1,6 +1,5 @@
 from PPlay.sprite import *
 from PPlay.window import *
-from random import randint
 import Mdificuldade as MD
 import game_loop as GL
 
@@ -13,6 +12,7 @@ mouse = janela.get_mouse()
 
 fundo_menu = Sprite('assets/background/fundo.png')
 fundo_menu.set_position(0, -fundo_menu.height + janela.height)
+
 # sobra é calculado para evitar que caso a imagem ser maior que a tela elas se sobreponham
 sobra_menu = janela.height - fundo_menu.height
 fundo_menu2 = Sprite('assets/background/fundo.png')
