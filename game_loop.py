@@ -21,6 +21,9 @@ def jogar_def(janela, teclado):
     rua_i = 50
     rua_f = fundo.width - 50
 
+    hud = Sprite('assets/background/hud.png')
+    hud.set_position(0,0)
+
     # definindo o player(revisar/estudar conceitos de animação e frames)
     player = Sprite('assets/PLAYER/carro_player.png')
     player.set_position(rua_i + janela.width / 2 - player.width / 2, janela.height - player.height - 30)
@@ -28,11 +31,16 @@ def jogar_def(janela, teclado):
 
     # definindo os inimigos
     # deve ser revisado para aumentar a variação dos inimigos
-    inimigo1 = Sprite('assets/inimigos/carro_a.png')
+    inimigo1 = Sprite('assets/inimigos/taxi.png')
     inimigo1.set_position(rua_i + janela.width / 2 - inimigo1.width / 2, 0)
 
     inimigo2 = Sprite('assets/inimigos/busuff.png')
     inimigo2.set_position(rua_i + janela.width / 4, 0)
+
+    inimigo3 = Sprite('assets/inimigos/wagon.png')
+    inimigo3.set_position(rua_i + janela.width / 2 - inimigo3.width / 2, 300)
+
+    inimigos_loc = [2, 3, 3]
 
     # coletaveis
     margem_coletaveis = 30
@@ -46,21 +54,32 @@ def jogar_def(janela, teclado):
     m1.set_position(pos_moedas, 0)
     m2.set_position(pos_moedas, m1.y + margem_coletaveis)
     m3.set_position(pos_moedas, m2.y + margem_coletaveis)
-    Moedas = [m1, m2, m3]
+    Moedas = [[m1, 0], [m2,0], [m3,0]]
 
     # bonus de velocidade com o tempo
     vel_bonus = 0
     cont_tick = 0
 
+    # carregar fonfon
+    carrega_fofon = 1
+
+    # contadores:
+    cont_moedas = 0
+    cont_distancia = 0
+
     # loop principal de jogo:
     inGame = True
     while inGame:
+        # desenhando as imagens de fundo:
+        fundo2.draw()
+        fundo.draw()
+
         # opção para voltar ao menu/ futuramente substituida por um pause/configurações.
         if teclado.key_pressed("ESC"):
             inGame = False
 
         # movimentando o player para a direita:
-        if teclado.key_pressed("right") and player.x < rua_f - player.width // 2:
+        if teclado.key_pressed("right") and player.x < rua_f - player.width:
             x = player.x
             y = player.y
             # definindo novo sprite para o carro fazendo a curva.
@@ -68,6 +87,7 @@ def jogar_def(janela, teclado):
             player.set_position(x, y)
             # definição da velocidade do player.
             player.move_x(player_vel * janela.delta_time())
+
         # movimentando o player para a esquerda:
         elif teclado.key_pressed("left") and player.x > rua_i:
             x = player.x
@@ -84,13 +104,20 @@ def jogar_def(janela, teclado):
             player = Sprite('assets/PLAYER/carro_player.png')
             player.set_position(x, y)
 
+        carrega_fofon += janela.delta_time()
+        if teclado.key_pressed("space") and carrega_fofon >= 0.8:
+            carrega_fofon = 0
+            print('fonfon')
+
+
+
         # COLISÃO!!!!!!!!!
-        if player.collided(inimigo1) or player.collided(inimigo2):
-            GF.gameOver(teclado, janela)
+        if player.collided(inimigo1) or player.collided(inimigo2) or player.collided(inimigo3):
+            inGame = GF.gameOver(teclado, janela, cont_moedas, cont_distancia)
 
         # definição da velocidade qual o fundo estara deslizando:
-        fundo2.move_y(fundo_vel * janela.delta_time() + vel_bonus/2)
-        fundo.move_y(fundo_vel * janela.delta_time() + vel_bonus/2)
+        fundo2.move_y(fundo_vel * janela.delta_time() + vel_bonus)
+        fundo.move_y(fundo_vel * janela.delta_time() + vel_bonus)
 
         # mecanismo de reposição do fundo:
         if fundo2.y > janela.height:
@@ -100,39 +127,54 @@ def jogar_def(janela, teclado):
 
         # atualizando e desenhando os componentes de jogo na tela
         # atualizando a posição dos inimigos:
-        GF.mover_inimigo(inimigo1, vel_bonus, janela, rua_i)
-        GF.mover_inimigo(inimigo2, vel_bonus, janela, rua_i)
+        inimigo1, inimigos_loc[0] = GF.mover_inimigo(inimigo1, vel_bonus, janela, rua_i, inimigos_loc[0])
+        inimigo2, inimigos_loc[1] = GF.mover_inimigo(inimigo2, vel_bonus, janela, rua_i, inimigos_loc[1])
+        inimigo3, inimigos_loc[2] = GF.mover_inimigo(inimigo3, vel_bonus, janela, rua_i, inimigos_loc[2])
 
-        # definindo a cor do fundo
-        janela.set_background_color('black')
-
-        # desenhando as imagens de fundo:
-        fundo2.draw()
-        fundo.draw()
-
+        inimigo1.x, inimigo1.y = GF.tem_sobrepos(inimigo1, inimigos_loc[0], inimigo2, inimigos_loc[1])
+        inimigo1.x, inimigo1.y = GF.tem_sobrepos(inimigo1, inimigos_loc[0], inimigo3, inimigos_loc[2])
+        inimigo2.x, inimigo2.y = GF.tem_sobrepos(inimigo2, inimigos_loc[1], inimigo3, inimigos_loc[2])
         # atualizando a posição dos coletaveis
         if Moedas:
             for mod in Moedas:
-                modx = mod.x
-                mody = mod.y
-                if mod.collided(player):
-                    mod = Sprite("assets/coletaveis/coletado20x20.png")
-                    mod.set_position(modx, mody)
-                else:
-                    mod.draw()
-                    mod.update()
+                modx = mod[0].x
+                mody = mod[0].y
+                if player.collided(mod[0]) and mod[0].file_name == "assets/coletaveis/moeda.png":
+                    cont_moedas += 1
+                if mod[0].collided(player):
+                    mod[1] = 1
+                    mod[0] = Sprite("assets/coletaveis/moeda(1).png")
+                    mod[0].set_sequence_time(0, 8, 300, True)
+                    mod[0].set_position(modx, mody)
+
+                mod[0].draw()
+                mod[0].update()
         GF.mover_moedas(Moedas, janela, fundo_vel, rua_i)
         # mover_moedas(Moedas, janela, fundo_vel)
-        print(Moedas)
+        # print(Moedas)
 
         cont_tick += 1
-        if cont_tick == 60 and vel_bonus < 200:
+        if cont_tick == 60 and vel_bonus < 15:
             cont_tick = 0
-            vel_bonus += 0.1
-            if vel_bonus == 100:
+            if vel_bonus <= 20:
+                vel_bonus += 0.1
+            else:
+                vel_bonus += 0.3
+            if vel_bonus == 10:
                 player_vel += 50
-            if vel_bonus == 200:
+            if vel_bonus == 15:
                 player_vel += 50
+
+        if vel_bonus <= 8:
+            cont_distancia += 0.05
+        elif vel_bonus <= 15:
+            cont_distancia += 0.7
+        else:
+            if cont_distancia >= 1000:
+                cont_distancia += 3
+            elif cont_distancia >= 500:
+                cont_distancia += 1.5
+        # print(cont_distancia, vel_bonus, cont_moedas)
 
         # desenhando o player:
         player.draw()
@@ -140,7 +182,12 @@ def jogar_def(janela, teclado):
         # desenhando os inimigos:
         inimigo1.draw()
         inimigo2.draw()
+        inimigo3.draw()
 
+        # dezenhado o hud
+        hud.draw()
+        janela.draw_text(f"G:{cont_moedas}", 10, 10, 20, (0,0,255), 'Arial', True, False)
+        janela.draw_text(f"D:{cont_distancia:.2f}m", 10, 30, 20, (0, 0, 255), 'Arial', True, False)
         # atualizando a tela.
         clock.tick(60)
         janela.update()

@@ -2,6 +2,8 @@ from PPlay.sprite import *
 from PPlay.window import *
 import Mdificuldade as MD
 import game_loop as GL
+import pygame
+
 
 
 # definindo a janela e os inputs
