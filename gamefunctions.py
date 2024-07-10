@@ -4,6 +4,19 @@ from random import randint
 # função que move os inimigos na tela, deve ser recvisado para aumentar a variação dos inimigos e/ou
 # evitar sobreposição nas faixas.
 
+def chack_recorde(dist_percorrida):
+    arquivo = open('records.txt', 'r')
+    lines = arquivo.readlines(-1)
+    recorde = lines[0]
+    arquivo.close()
+    if dist_percorrida >= float(recorde):
+        registra_recorde(dist_percorrida)
+
+def registra_recorde(recorde):
+    arquivo = open('records.txt', 'w')
+    arquivo.write(f'{recorde}')
+    arquivo.close()
+
 
 def roleta_inimigo():
     i = randint(1, 5)
@@ -72,26 +85,19 @@ def mover_moedas(moedas, janela, vel, rua_i):
 
 
 def gameOver(teclado, janela, tot_moedas, tot_distancia):
-    print("ME CHAMARAM")
     # salvando o progresso
+    chack_recorde(tot_distancia)
     arq = open('registro.txt', 'r')
-    print(f'1: {tot_moedas}, {tot_distancia}')
     lines = arq.readlines(2)
     for linha in lines:
-        print(f'linha:{linha}')
         linha = float(linha.replace('\n',''))
     a = lines[0]
-    print(f'a: {a}')
     tot_moedas += int(a)
-    # b = int(arq.readline(2).isnumeric())
     b = lines[-1]
     tot_distancia += float(b)
-    print(f'b: {b}')
-    print(f'2: {tot_moedas}, {tot_distancia}')
     arq.close()
     arq = open('registro.txt', 'w')
     arq.write(f'{tot_moedas}\n{tot_distancia:.2f}\n')
-    print(f'3: {tot_moedas}, {tot_distancia}')
     arq.close()
 
     gameover = Sprite("assets/background/game_over.png")
@@ -108,4 +114,6 @@ def tem_sobrepos(inimigo1, faixa1, inimigo2, faixa2):
     if faixa1 != faixa2 or not inimigo1.collided(inimigo2):
         return inimigo1.x, inimigo1.y
     return inimigo1.x, -inimigo1.height
+
+
 

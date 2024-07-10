@@ -2,10 +2,17 @@ from PPlay.sprite import *
 from PPlay.window import *
 from pygame.time import Clock
 import gamefunctions as GF
+from pygame import mixer
 
 
-def jogar_def(janela, teclado):
+def jogar_def(janela, teclado, efeitos_vol):
     clock = Clock()
+    motor_sound = mixer.Sound("sons/car.mp3")
+    motor_sound.set_volume(efeitos_vol)
+    buzina_sound = mixer.Sound("sons/buzina.mp3")
+    moeda_sound = mixer.Sound("sons/moeda.mp3")
+    moeda_sound.set_volume(efeitos_vol)
+
     # definindo as imagens que compoem o fundo do jogo (chão/rua)
     # são usadas as variaveis fundo e fundo2 pois precisamos que o fundo2 complete o gap deixado pelo fundo e vice
     # versa.
@@ -70,6 +77,9 @@ def jogar_def(janela, teclado):
     # loop principal de jogo:
     inGame = True
     while inGame:
+        if cont_distancia == 0:
+            motor_sound.play(False)
+
         # desenhando as imagens de fundo:
         fundo2.draw()
         fundo.draw()
@@ -107,8 +117,7 @@ def jogar_def(janela, teclado):
         carrega_fofon += janela.delta_time()
         if teclado.key_pressed("space") and carrega_fofon >= 0.8:
             carrega_fofon = 0
-            print('fonfon')
-
+            buzina_sound.play(False)
 
 
         # COLISÃO!!!!!!!!!
@@ -141,6 +150,7 @@ def jogar_def(janela, teclado):
                 mody = mod[0].y
                 if player.collided(mod[0]) and mod[0].file_name == "assets/coletaveis/moeda.png":
                     cont_moedas += 1
+                    moeda_sound.play(False)
                 if mod[0].collided(player):
                     mod[1] = 1
                     mod[0] = Sprite("assets/coletaveis/moeda(1).png")
