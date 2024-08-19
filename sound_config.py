@@ -39,13 +39,14 @@ def configuracoes(janela, teclado, mouse, efeitos_vol, music_vol):
         backcround.draw()
         mousex, mousey = mouse.get_position()
         mousebox.set_position(mousex, mousey)
+        print(mousex, mousey)
 
         mouse_delay += janela.delta_time()
 
         janela.draw_text(f"volume musica:  {music_vol*100:.0f}", 150, 250, 30, (0,0,0), "arial", False, False)
         if mousebox.collided(mais_normal_1):
             mais_selec_1.draw()
-            if mouse.is_button_pressed(1) and mouse_delay >= 0.5 and music_vol <= 0.9:
+            if mouse.is_button_pressed(1) and mouse_delay >= 1 and music_vol <= 0.9:
                 mouse_delay = 0
                 music_vol += 0.1
         else:
@@ -53,7 +54,7 @@ def configuracoes(janela, teclado, mouse, efeitos_vol, music_vol):
         janela.draw_text(f"+", 320, 300, 30, (0, 0, 0), "arial", False, False)
         if mousebox.collided(menos_normal_1):
             menos_selec_1.draw()
-            if mouse.is_button_pressed(1) and mouse_delay >= 0.5 and music_vol >= 0.1:
+            if mouse.is_button_pressed(1) and mouse_delay >= 1 and music_vol >= 0.1:
                 mouse_delay = 0
                 music_vol -= 0.1
         else:
@@ -63,7 +64,7 @@ def configuracoes(janela, teclado, mouse, efeitos_vol, music_vol):
         janela.draw_text(f"volume efeitos:  {efeitos_vol*100:.0f}", 150, 450, 30, (0, 0, 0), "arial", False, False)
         if mousebox.collided(mais_normal_2):
             mais_selec_2.draw()
-            if mouse.is_button_pressed(1) and mouse_delay >= 0.5 and efeitos_vol <= 0.9:
+            if mouse.is_button_pressed(1) and mouse_delay >= 1 and efeitos_vol <= 0.9:
                 mouse_delay = 0
                 efeitos_vol += 0.1
         else:
@@ -71,12 +72,13 @@ def configuracoes(janela, teclado, mouse, efeitos_vol, music_vol):
         janela.draw_text(f"+", 320, 500, 30, (0, 0, 0), "arial", False, False)
         if mousebox.collided(menos_normal_2):
             menos_selec_2.draw()
-            if mouse.is_button_pressed(1) and mouse_delay >= 0.5 and efeitos_vol >= 0.1:
+            if mouse.is_button_pressed(1) and mouse_delay >= 1 and efeitos_vol >= 0.1:
                 mouse_delay = 0
                 efeitos_vol -= 0.1
         else:
             menos_normal_2.draw()
         janela.draw_text(f"-", 170, 500, 30, (0, 0, 0), "arial", False, False)
+
 
 
         if teclado.key_pressed("escape"):

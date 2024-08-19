@@ -88,12 +88,16 @@ def gameOver(teclado, janela, tot_moedas, tot_distancia):
     # salvando o progresso
     chack_recorde(tot_distancia)
     arq = open('registro.txt', 'r')
-    lines = arq.readlines(-1)
+    lines = arq.readlines(2)
+    for linha in lines:
+        linha = float(linha.replace('\n',''))
     a = lines[0]
     tot_moedas += int(a)
+    b = lines[-1]
+    tot_distancia += float(b)
     arq.close()
     arq = open('registro.txt', 'w')
-    arq.write(f'{tot_moedas}')
+    arq.write(f'{tot_moedas}\n{tot_distancia:.2f}\n')
     arq.close()
 
     gameover = Sprite("assets/background/game_over.png")
@@ -111,33 +115,5 @@ def tem_sobrepos(inimigo1, faixa1, inimigo2, faixa2):
         return inimigo1.x, inimigo1.y
     return inimigo1.x, -inimigo1.height
 
-def decide_sprite_ret(flag):
-    if flag == 1:
-        return Sprite('assets/PLAYER/carro1_ret.png')
-    elif flag == 2:
-        return Sprite('assets/PLAYER/carro2_ret.png')
-    elif flag == 3:
-        return Sprite('assets/PLAYER/carro3_ret.png')
-    elif flag == 4:
-        return Sprite('assets/PLAYER/carro4_ret.png')
 
-def decide_sprite_esq(flag):
-    if flag == 1:
-        return Sprite('assets/PLAYER/carro1_esq.png')
-    elif flag == 2:
-        return Sprite('assets/PLAYER/carro2_esq.png')
-    elif flag == 3:
-        return Sprite('assets/PLAYER/carro3_esq.png')
-    elif flag == 4:
-        return Sprite('assets/PLAYER/carro4_esq.png')
-
-def decide_sprite_dir(flag):
-    if flag == 1:
-        return Sprite('assets/PLAYER/carro1_dir.png')
-    elif flag == 2:
-        return Sprite('assets/PLAYER/carro2_dir.png')
-    elif flag == 3:
-        return Sprite('assets/PLAYER/carro3_dir.png')
-    elif flag == 4:
-        return Sprite('assets/PLAYER/carro4_dir.png')
 
