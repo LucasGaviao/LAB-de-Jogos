@@ -5,7 +5,7 @@ import gamefunctions as GF
 from pygame import mixer
 
 
-def jogar_def(janela, teclado, efeitos_vol):
+def jogar_def(janela, teclado, efeitos_vol, carro):
     clock = Clock()
     motor_sound = mixer.Sound("sons/car.mp3")
     motor_sound.set_volume(efeitos_vol)
@@ -32,7 +32,10 @@ def jogar_def(janela, teclado, efeitos_vol):
     hud.set_position(0,0)
 
     # definindo o player(revisar/estudar conceitos de animação e frames)
-    player = Sprite('assets/PLAYER/carro_player.png')
+    carro_ret = GF.decide_sprite_ret(carro)
+    carro_dir = GF.decide_sprite_dir(carro)
+    carro_esq = GF.decide_sprite_esq(carro)
+    player = carro_ret
     player.set_position(rua_i + janela.width / 2 - player.width / 2, janela.height - player.height - 30)
     player_vel = 200
 
@@ -93,7 +96,7 @@ def jogar_def(janela, teclado, efeitos_vol):
             x = player.x
             y = player.y
             # definindo novo sprite para o carro fazendo a curva.
-            player = Sprite('assets/PLAYER/carro_player_dir.png')
+            player = carro_dir
             player.set_position(x, y)
             # definição da velocidade do player.
             player.move_x(player_vel * janela.delta_time())
@@ -103,7 +106,7 @@ def jogar_def(janela, teclado, efeitos_vol):
             x = player.x
             y = player.y
             # definindo novo sprite para o carro fazendo a curva.
-            player = Sprite('assets/PLAYER/carro_player_esq.png')
+            player = carro_esq
             player.set_position(x, y)
             # definição da velocidade do player.
             player.move_x(-player_vel * janela.delta_time())
@@ -111,7 +114,7 @@ def jogar_def(janela, teclado, efeitos_vol):
             x = player.x
             y = player.y
             # Definindo o sprite original caso não haja movimento lateral
-            player = Sprite('assets/PLAYER/carro_player.png')
+            player = carro_ret
             player.set_position(x, y)
 
         carrega_fofon += janela.delta_time()
@@ -160,8 +163,6 @@ def jogar_def(janela, teclado, efeitos_vol):
                 mod[0].draw()
                 mod[0].update()
         GF.mover_moedas(Moedas, janela, fundo_vel, rua_i)
-        # mover_moedas(Moedas, janela, fundo_vel)
-        # print(Moedas)
 
         cont_tick += 1
         if cont_tick == 60 and vel_bonus < 15:
@@ -184,7 +185,6 @@ def jogar_def(janela, teclado, efeitos_vol):
                 cont_distancia += 3
             elif cont_distancia >= 500:
                 cont_distancia += 1.5
-        # print(cont_distancia, vel_bonus, cont_moedas)
 
         # desenhando o player:
         player.draw()
